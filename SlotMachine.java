@@ -34,6 +34,11 @@ public class SlotMachine extends JFrame {
     private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
     private static final Font SYMBOL_FONT = new Font("Segoe UI Emoji", Font.PLAIN, 40);
 
+    // Sound Manager
+    private final SlotSoundManager soundManager = new SlotSoundManager();
+    private final String BACKGROUND_MUSIC = "bg_music"; // Identifier for background music
+
+    // Constructor for the SlotMachine class
     public SlotMachine() {
         // Frame setup
         setTitle("Secrets of the Mermaid");
@@ -41,6 +46,13 @@ public class SlotMachine extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null); // Use absolute positioning
+
+        // Load and loop background music
+        soundManager.load(BACKGROUND_MUSIC, "Audio/backgroundmusic.wav");
+        soundManager.setGlobalVolume(0.5f); // Default to 50%
+        soundManager.loop(BACKGROUND_MUSIC);
+
+        soundManager.load("spin", "Audio/buttonClick.wav");
 
         // Initialize game components
         gameState = new GameState();
@@ -176,7 +188,59 @@ public class SlotMachine extends JFrame {
         spinButton.setForeground(Color.BLACK);
         spinButton.setBounds(700, controlY + 40, 120, 35);
         mainPanel.add(spinButton);
+        spinButton.addActionListener(e -> {
+            soundManager.play("spin");
+        });
         
+        
+        // Volume controls
+        lblVolume.setForeground(Color.WHITE);
+        lblVolume.setFont(new Font("Arial", Font.BOLD, 14));
+        lblVolume.setBounds(170, controlY + 80, 40, 25);
+        mainPanel.add(lblVolume);
+        
+        volumeVal.setFont(new Font("Arial", Font.PLAIN, 14));
+        volumeVal.setText("50");
+        volumeVal.setBounds(220, controlY + 80, 50, 25);
+        mainPanel.add(volumeVal);
+        
+        // Volume buttons
+        decreaseVol.setFont(new Font("Arial", Font.BOLD, 14));
+        decreaseVol.setBounds(280, controlY + 80, 60, 25);
+        mainPanel.add(decreaseVol);
+        
+        increaseVol.setFont(new Font("Arial", Font.BOLD, 14));
+        increaseVol.setBounds(330, controlY + 80, 60, 25);
+        mainPanel.add(increaseVol);
+    
+
+        // Volume button actions
+        increaseVol.addActionListener(e -> {
+            try {
+                int current = Integer.parseInt(volumeVal.getText());
+                if (current < 100) {
+                    current += 5;
+                    volumeVal.setText(String.valueOf(current));
+                    soundManager.setGlobalVolume(current / 100f);
+                }
+            } catch (NumberFormatException ignored) {}
+        });
+
+        decreaseVol.addActionListener(e -> {
+            try {
+                int current = Integer.parseInt(volumeVal.getText());
+                if (current > 0) {
+                    current -= 5;
+                    volumeVal.setText(String.valueOf(current));
+                    soundManager.setGlobalVolume(current / 100f);
+                }
+            } catch (NumberFormatException ignored) {}
+        });
+    }
+
+    // Method to set the player's name
+    public void setPlayerName(String username) {
+        accountLabel.setText(username);  // Replace "Player" with the username
         // Setup button actions
         setupButtonActions();
         

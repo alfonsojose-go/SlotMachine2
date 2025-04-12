@@ -5,16 +5,16 @@ import java.util.HashMap;
 
 public class SlotSoundManager {
     private final HashMap<String, Clip> soundClips = new HashMap<>();
-    private float currentVolume = 1.0f; // Default to 100% volume
+    private float currentVolume = 1.0f; // Default volume (100%)
 
-    // Load a sound file and apply current volume
+    // Load and store sound clip
     public void load(String name, String filePath) {
         try {
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(new File(filePath));
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             soundClips.put(name, clip);
-            applyVolume(clip); // Apply current volume to newly loaded clip
+            applyVolume(clip); // Apply current volume
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.err.println("Error loading sound: " + name);
             e.printStackTrace();
@@ -31,7 +31,7 @@ public class SlotSoundManager {
         }
     }
 
-    // Loop sound continuously
+    // Loop sound
     public void loop(String name) {
         Clip clip = soundClips.get(name);
         if (clip != null) {
@@ -47,7 +47,17 @@ public class SlotSoundManager {
         }
     }
 
-    // Set global volume (0.0 to 1.0) and apply to all clips
+    // Increase volume by 10%
+    public void increaseVolume() {
+        setGlobalVolume(currentVolume + 0.1f);
+    }
+
+    // Decrease volume by 10%
+    public void decreaseVolume() {
+        setGlobalVolume(currentVolume - 0.1f);
+    }
+
+    // Set volume globally (clamped between 0 and 1)
     public void setGlobalVolume(float volume) {
         this.currentVolume = Math.max(0f, Math.min(volume, 1f));
         for (Clip clip : soundClips.values()) {
@@ -55,21 +65,26 @@ public class SlotSoundManager {
         }
     }
 
-    // Internal: apply volume to a specific clip
+    // Get current volume (0.0 to 1.0)
+    public float getCurrentVolume() {
+        return currentVolume;
+    }
+
+    // Apply current volume to a clip
     private void applyVolume(Clip clip) {
         try {
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            float dB = (float) (Math.log10(Math.max(currentVolume, 0.0001)) * 20);
+            float dB = (float) (Math.log10(Math.max(currentVolume, 0.0001)) * 20); // Convert to decibels
             float min = gainControl.getMinimum();
             float max = gainControl.getMaximum();
-            dB = Math.max(min, Math.min(dB, max));
+            dB = Math.max(min, Math.min(dB, max)); // Clamp dB to valid range
             gainControl.setValue(dB);
         } catch (IllegalArgumentException e) {
             System.err.println("Volume control not supported for this clip.");
         }
     }
 
-    // Clean up
+    // Release resources
     public void cleanup() {
         for (Clip clip : soundClips.values()) {
             clip.close();
