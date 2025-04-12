@@ -3,7 +3,7 @@ import javax.swing.*;
 
 public class SlotMachine extends JFrame {
     // UI Components
-    public JLabel[][] reels = new JLabel[5][6];
+    public JLabel[][] reels = new JLabel[6][5];
     public JButton spinButton = new JButton("SPIN");
     public JButton increaseVol = new JButton("+");
     public JButton decreaseVol = new JButton("-");
@@ -15,7 +15,7 @@ public class SlotMachine extends JFrame {
     public JTextField insertCoin = new JTextField();
     public JTextField betField = new JTextField();
     public JTextField volumeVal = new JTextField();
-    
+
     // Image paths
     private final String BG_PATH = "Assets/scales.jpg";
     private final String LEFT_DECOR = "Assets/leftDecor.jpg";
@@ -25,6 +25,11 @@ public class SlotMachine extends JFrame {
         "🐟", "🦀", "🐬", "🐚", "⚓", "🔱", "💎", "🚢", "💰"
     };
 
+    // Sound Manager
+    private final SlotSoundManager soundManager = new SlotSoundManager();
+    private final String BACKGROUND_MUSIC = "bg_music"; // Identifier for background music
+
+    // Constructor for the SlotMachine class
     public SlotMachine() {
         // Frame setup
         setTitle("Secrets of the Mermaid");
@@ -32,6 +37,13 @@ public class SlotMachine extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null); // Use absolute positioning
+
+        // Load and loop background music
+        soundManager.load(BACKGROUND_MUSIC, "Audio/backgroundmusic.wav");
+        soundManager.setGlobalVolume(0.5f); // Default to 50%
+        soundManager.loop(BACKGROUND_MUSIC);
+
+        soundManager.load("spin", "Audio/buttonClick.wav");
 
         // Main panel with background
         JPanel mainPanel = new JPanel(null) {
@@ -64,15 +76,15 @@ public class SlotMachine extends JFrame {
         mainPanel.add(rightPanel);
 
         // Create 5x6 grid of reels
-        JPanel reelsPanel = new JPanel(new GridLayout(6, 5, 10, 10));
+        JPanel reelsPanel = new JPanel(new GridLayout(5, 6, 10, 10));
         reelsPanel.setBounds(150 + 15, 120, 700 - 30, 300);
         reelsPanel.setBackground(Color.WHITE);
         reelsPanel.setOpaque(true);
         reelsPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
         // Initialize reels with random symbols
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 5; col++) {
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 6; col++) {
                 reels[col][row] = new JLabel(SYMBOLS[(int)(Math.random() * SYMBOLS.length)], JLabel.CENTER);
                 reels[col][row].setFont(new Font("Segoe UI Emoji", Font.PLAIN, 40));
                 reels[col][row].setOpaque(true);
@@ -123,6 +135,10 @@ public class SlotMachine extends JFrame {
         spinButton.setForeground(Color.BLACK);
         spinButton.setBounds(700, controlY + 40, 120, 35);// Spin button
         mainPanel.add(spinButton);
+        spinButton.addActionListener(e -> {
+            soundManager.play("spin");
+        });
+        
         
         // Volume controls
         lblVolume.setForeground(Color.WHITE);
@@ -143,15 +159,34 @@ public class SlotMachine extends JFrame {
         increaseVol.setFont(new Font("Arial", Font.BOLD, 14));
         increaseVol.setBounds(330, controlY + 80, 60, 25);
         mainPanel.add(increaseVol);
-        
-        
+    
+
+        // Volume button actions
+        increaseVol.addActionListener(e -> {
+            try {
+                int current = Integer.parseInt(volumeVal.getText());
+                if (current < 100) {
+                    current += 5;
+                    volumeVal.setText(String.valueOf(current));
+                    soundManager.setGlobalVolume(current / 100f);
+                }
+            } catch (NumberFormatException ignored) {}
+        });
+
+        decreaseVol.addActionListener(e -> {
+            try {
+                int current = Integer.parseInt(volumeVal.getText());
+                if (current > 0) {
+                    current -= 5;
+                    volumeVal.setText(String.valueOf(current));
+                    soundManager.setGlobalVolume(current / 100f);
+                }
+            } catch (NumberFormatException ignored) {}
+        });
     }
 
-    public static void main(String[] args) {
-        // Set system properties for better emoji rendering
-        System.setProperty("awt.useSystemAAFontSettings", "on");
-        System.setProperty("swing.aatext", "true");
-        
-        SwingUtilities.invokeLater(() -> new SlotMachine().setVisible(true));
+    // Method to set the player's name
+    public void setPlayerName(String username) {
+        accountLabel.setText(username);  // Replace "Player" with the username
     }
 }
