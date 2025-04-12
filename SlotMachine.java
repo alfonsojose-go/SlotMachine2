@@ -7,13 +7,17 @@ public class SlotMachine extends JFrame {
     public JButton spinButton = new JButton("SPIN");
     public JButton increaseVol = new JButton("+");
     public JButton decreaseVol = new JButton("-");
+    public JButton increaseCoin = new JButton("+");
+    public JButton decreaseCoin = new JButton("-");
+    public JButton increaseBet = new JButton("+");
+    public JButton decreaseBet = new JButton("-");
     public JLabel accountLabel = new JLabel("Player:");
     public JLabel accountBalance = new JLabel("$00.00");
     public JLabel lblInsertCoin = new JLabel("Insert Coin:");
+    public JLabel lblCoinAmt = new JLabel("0");
     public JLabel lblbet = new JLabel("Bet Amount:");
+    public JLabel lblBetAmt = new JLabel ("0");
     public JLabel lblVolume = new JLabel("Vol:");
-    public JTextField insertCoin = new JTextField();
-    public JTextField betField = new JTextField();
     public JTextField volumeVal = new JTextField();
 
     // Image paths
@@ -115,9 +119,18 @@ public class SlotMachine extends JFrame {
         lblInsertCoin.setBounds(170, controlY + 40, 90, 25);
         mainPanel.add(lblInsertCoin);
         
-        insertCoin.setFont(new Font("Arial", Font.PLAIN, 14));
-        insertCoin.setBounds(270, controlY + 40, 150, 25);
-        mainPanel.add(insertCoin);
+        lblCoinAmt.setForeground(Color.WHITE);
+        lblCoinAmt.setFont(new Font("Arial", Font.BOLD, 14));
+        lblCoinAmt.setBounds(270, controlY + 40, 150, 25);
+        mainPanel.add(lblCoinAmt);
+
+        increaseCoin.setFont(new Font("Arial", Font.PLAIN, 14));
+        increaseCoin.setBounds(300, controlY + 40, 50, 25);
+        mainPanel.add(increaseCoin);
+
+        decreaseCoin.setFont(new Font("Arial", Font.PLAIN, 14));
+        decreaseCoin.setBounds(370, controlY + 40, 50, 25);
+        mainPanel.add(decreaseCoin);
         
         // Bet amount section
         lblbet.setForeground(Color.WHITE);
@@ -125,9 +138,18 @@ public class SlotMachine extends JFrame {
         lblbet.setBounds(430, controlY + 40, 90, 25);
         mainPanel.add(lblbet);
         
-        betField.setFont(new Font("Arial", Font.PLAIN, 14));
-        betField.setBounds(530, controlY + 40, 150, 25);
-        mainPanel.add(betField);
+        lblBetAmt.setForeground(Color.WHITE);
+        lblBetAmt.setFont(new Font("Arial", Font.BOLD, 14));
+        lblBetAmt.setBounds(530, controlY + 40, 150, 25);
+        mainPanel.add(lblBetAmt);
+
+        increaseBet.setFont(new Font("Arial", Font.PLAIN, 14));
+        increaseBet.setBounds(560, controlY + 40, 50, 25);
+        mainPanel.add(increaseBet);
+
+        decreaseBet.setFont(new Font("Arial", Font.PLAIN, 14));
+        decreaseBet.setBounds(620, controlY + 40, 50, 25);
+        mainPanel.add(decreaseBet);
 
         // Spin button
         spinButton.setFont(new Font("Arial", Font.BOLD, 16));
@@ -189,4 +211,5 @@ public class SlotMachine extends JFrame {
     public void setPlayerName(String username) {
         accountLabel.setText(username);  // Replace "Player" with the username
     }
+    
 }
