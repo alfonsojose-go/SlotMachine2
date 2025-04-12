@@ -100,11 +100,11 @@ public class SlotMachine extends JFrame {
         // Insert coin section
         lblInsertCoin.setForeground(Color.WHITE);
         lblInsertCoin.setFont(new Font("Arial", Font.BOLD, 14));
-        lblInsertCoin.setBounds(170, controlY + 40, 80, 25);
+        lblInsertCoin.setBounds(170, controlY + 40, 90, 25);
         mainPanel.add(lblInsertCoin);
         
         insertCoin.setFont(new Font("Arial", Font.PLAIN, 14));
-        insertCoin.setBounds(260, controlY + 40, 150, 25);
+        insertCoin.setBounds(270, controlY + 40, 150, 25);
         mainPanel.add(insertCoin);
         
         // Bet amount section
