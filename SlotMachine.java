@@ -145,7 +145,7 @@ public class SlotMachine extends JFrame {
         messageLabel.setForeground(Color.YELLOW);
         messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        messageLabel.setBounds(350, controlY + 80, 300, 25);
+        messageLabel.setBounds(300, controlY + 80, 600, 25);
         mainPanel.add(messageLabel);
 
         // Coin value controls
