@@ -4,7 +4,6 @@ public class GameState {
     private int betMultiplier;
     private double totalBet;
     private boolean isSpinning;
-    private double mermaidChance;
 
     public GameState() {
         this.balance = 1000.0;
@@ -12,7 +11,6 @@ public class GameState {
         this.betMultiplier = 1;
         this.totalBet = coinValue * betMultiplier;
         this.isSpinning = false;
-        this.mermaidChance = 0.1;
     }
 
     public double getBalance() {
@@ -57,13 +55,5 @@ public class GameState {
 
     public void setSpinning(boolean spinning) {
         this.isSpinning = spinning;
-    }
-
-    public double getMermaidChance() {
-        return mermaidChance;
-    }
-
-    public void updateMermaidChance(double change) {
-        this.mermaidChance = Math.max(0.1, Math.min(0.5, mermaidChance + change));
     }
 }
