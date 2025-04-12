@@ -22,6 +22,12 @@ public class SlotMachine extends JFrame {
     private JLabel messageLabel = new JLabel("");
     private JLabel mermaidChanceLabel = new JLabel("Mermaid Chance: 10%");
     
+    // Volume controls
+    private JLabel lblVolume = new JLabel("Vol:");
+    private JTextField volumeVal = new JTextField();
+    private JButton decreaseVol = new JButton("-");
+    private JButton increaseVol = new JButton("+");
+    
     // Image paths
     private final String BG_PATH = "Assets/scales.jpg";
     private final String LEFT_DECOR = "Assets/leftDecor.jpg";
@@ -38,7 +44,6 @@ public class SlotMachine extends JFrame {
     private final SlotSoundManager soundManager = new SlotSoundManager();
     private final String BACKGROUND_MUSIC = "bg_music"; // Identifier for background music
 
-    // Constructor for the SlotMachine class
     public SlotMachine() {
         // Frame setup
         setTitle("Secrets of the Mermaid");
@@ -49,10 +54,12 @@ public class SlotMachine extends JFrame {
 
         // Load and loop background music
         soundManager.load(BACKGROUND_MUSIC, "Audio/backgroundmusic.wav");
+        soundManager.load("spin", "Audio/buttonClick.wav");
+        soundManager.load("jackpot", "Audio/jackpot.wav");
+        soundManager.load("smallwin", "Audio/smallwin.wav");
+        
         soundManager.setGlobalVolume(0.5f); // Default to 50%
         soundManager.loop(BACKGROUND_MUSIC);
-
-        soundManager.load("spin", "Audio/buttonClick.wav");
 
         // Initialize game components
         gameState = new GameState();
@@ -108,15 +115,6 @@ public class SlotMachine extends JFrame {
         }
         mainPanel.add(reelsPanel);
 
-        // Add mermaid chance label
-        mermaidChanceLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        mermaidChanceLabel.setForeground(Color.BLUE);
-        mermaidChanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        JPanel mermaidPanel = new JPanel();
-        mermaidPanel.add(mermaidChanceLabel);
-        mermaidPanel.setBounds(150, 80, 700, 30);
-        mainPanel.add(mermaidPanel);
-
         // Control panel area
         int controlY = 440;
         
@@ -130,21 +128,40 @@ public class SlotMachine extends JFrame {
         accountBalance.setFont(new Font("Arial", Font.BOLD, 14));
         accountBalance.setBounds(240, controlY, 120, 25);
         mainPanel.add(accountBalance);
-        
+
+        // Total bet display
+        totalBetDisplay.setForeground(Color.WHITE);
+        totalBetDisplay.setFont(new Font("Arial", Font.BOLD, 14));
+        totalBetDisplay.setBounds(370, controlY, 150, 25);
+        mainPanel.add(totalBetDisplay);
+
+        // Mermaid chance label
+        mermaidChanceLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        mermaidChanceLabel.setForeground(new Color(0, 191, 255));
+        mermaidChanceLabel.setBounds(530, controlY, 150, 25);
+        mainPanel.add(mermaidChanceLabel);
+
+        // Message label
+        messageLabel.setForeground(Color.YELLOW);
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        messageLabel.setBounds(350, controlY + 80, 300, 25);
+        mainPanel.add(messageLabel);
+
         // Coin value controls
         lblInsertCoin.setForeground(Color.WHITE);
         lblInsertCoin.setFont(new Font("Arial", Font.BOLD, 14));
         lblInsertCoin.setBounds(170, controlY + 40, 90, 25);
         mainPanel.add(lblInsertCoin);
         
-        decreaseCoin.setFont(new Font("Arial", Font.BOLD, 14));
-        decreaseCoin.setBounds(270, controlY + 40, 45, 25);
-        mainPanel.add(decreaseCoin);
-        
         coinValueDisplay.setForeground(Color.WHITE);
         coinValueDisplay.setFont(new Font("Arial", Font.BOLD, 14));
-        coinValueDisplay.setBounds(320, controlY + 40, 60, 25);
+        coinValueDisplay.setBounds(270, controlY + 40, 60, 25);
         mainPanel.add(coinValueDisplay);
+        
+        decreaseCoin.setFont(new Font("Arial", Font.BOLD, 14));
+        decreaseCoin.setBounds(340, controlY + 40, 45, 25);
+        mainPanel.add(decreaseCoin);
         
         increaseCoin.setFont(new Font("Arial", Font.BOLD, 14));
         increaseCoin.setBounds(385, controlY + 40, 45, 25);
@@ -156,31 +173,18 @@ public class SlotMachine extends JFrame {
         lblbet.setBounds(440, controlY + 40, 90, 25);
         mainPanel.add(lblbet);
         
-        decreaseBet.setFont(new Font("Arial", Font.BOLD, 14));
-        decreaseBet.setBounds(540, controlY + 40, 45, 25);
-        mainPanel.add(decreaseBet);
-        
         betMultiplierDisplay.setForeground(Color.WHITE);
         betMultiplierDisplay.setFont(new Font("Arial", Font.BOLD, 14));
-        betMultiplierDisplay.setBounds(590, controlY + 40, 45, 25);
+        betMultiplierDisplay.setBounds(540, controlY + 40, 45, 25);
         mainPanel.add(betMultiplierDisplay);
+        
+        decreaseBet.setFont(new Font("Arial", Font.BOLD, 14));
+        decreaseBet.setBounds(595, controlY + 40, 45, 25);
+        mainPanel.add(decreaseBet);
         
         increaseBet.setFont(new Font("Arial", Font.BOLD, 14));
         increaseBet.setBounds(640, controlY + 40, 45, 25);
         mainPanel.add(increaseBet);
-
-        // Total bet display
-        totalBetDisplay.setForeground(Color.WHITE);
-        totalBetDisplay.setFont(new Font("Arial", Font.BOLD, 14));
-        totalBetDisplay.setBounds(170, controlY + 80, 150, 25);
-        mainPanel.add(totalBetDisplay);
-
-        // Message label
-        messageLabel.setForeground(Color.YELLOW);
-        messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        messageLabel.setBounds(350, controlY + 80, 300, 25);
-        mainPanel.add(messageLabel);
 
         // Spin button
         spinButton.setFont(new Font("Arial", Font.BOLD, 16));
@@ -188,34 +192,37 @@ public class SlotMachine extends JFrame {
         spinButton.setForeground(Color.BLACK);
         spinButton.setBounds(700, controlY + 40, 120, 35);
         mainPanel.add(spinButton);
-        spinButton.addActionListener(e -> {
+        spinButton.addActionListener(_ -> {
             soundManager.play("spin");
         });
-        
-        
-        // Volume controls
+
+        // Volume controls - positioned on left side
+        JPanel volumePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        volumePanel.setOpaque(false); // Make panel transparent
+        volumePanel.setBounds(170, controlY + 80, 170, 25);
+        mainPanel.add(volumePanel);
+
         lblVolume.setForeground(Color.WHITE);
         lblVolume.setFont(new Font("Arial", Font.BOLD, 14));
-        lblVolume.setBounds(170, controlY + 80, 40, 25);
-        mainPanel.add(lblVolume);
+        volumePanel.add(lblVolume);
         
         volumeVal.setFont(new Font("Arial", Font.PLAIN, 14));
         volumeVal.setText("50");
-        volumeVal.setBounds(220, controlY + 80, 50, 25);
-        mainPanel.add(volumeVal);
+        volumeVal.setPreferredSize(new Dimension(30, 25));
+        volumeVal.setEditable(false); // Make readonly
+        volumeVal.setHorizontalAlignment(JTextField.CENTER); // Center the text
+        volumePanel.add(volumeVal);
         
-        // Volume buttons
         decreaseVol.setFont(new Font("Arial", Font.BOLD, 14));
-        decreaseVol.setBounds(280, controlY + 80, 60, 25);
-        mainPanel.add(decreaseVol);
+        decreaseVol.setPreferredSize(new Dimension(45, 25));
+        volumePanel.add(decreaseVol);
         
         increaseVol.setFont(new Font("Arial", Font.BOLD, 14));
-        increaseVol.setBounds(330, controlY + 80, 60, 25);
-        mainPanel.add(increaseVol);
-    
+        increaseVol.setPreferredSize(new Dimension(45, 25));
+        volumePanel.add(increaseVol);
 
         // Volume button actions
-        increaseVol.addActionListener(e -> {
+        increaseVol.addActionListener(_ -> {
             try {
                 int current = Integer.parseInt(volumeVal.getText());
                 if (current < 100) {
@@ -226,7 +233,7 @@ public class SlotMachine extends JFrame {
             } catch (NumberFormatException ignored) {}
         });
 
-        decreaseVol.addActionListener(e -> {
+        decreaseVol.addActionListener(_ -> {
             try {
                 int current = Integer.parseInt(volumeVal.getText());
                 if (current > 0) {
@@ -236,11 +243,7 @@ public class SlotMachine extends JFrame {
                 }
             } catch (NumberFormatException ignored) {}
         });
-    }
 
-    // Method to set the player's name
-    public void setPlayerName(String username) {
-        accountLabel.setText(username);  // Replace "Player" with the username
         // Setup button actions
         setupButtonActions();
         
@@ -248,25 +251,29 @@ public class SlotMachine extends JFrame {
         updateDisplays();
     }
 
+    public void setPlayerName(String username) {
+        accountLabel.setText(username);  // Replace "Player" with the username
+    }
+
     private void setupButtonActions() {
         spinButton.addActionListener(_ -> gameLogic.spin());
         
         increaseCoin.addActionListener(_ -> {
             if (!gameState.isSpinning()) {
-                gameState.setCoinValue(gameState.getCoinValue() + 0.05);
+                gameState.setCoinValue(gameState.getCoinValue() + 1.00);
                 updateDisplays();
             }
         });
         
         decreaseCoin.addActionListener(_ -> {
             if (!gameState.isSpinning()) {
-                gameState.setCoinValue(gameState.getCoinValue() - 0.05);
+                gameState.setCoinValue(gameState.getCoinValue() - 1.00);
                 updateDisplays();
             }
         });
         
         increaseBet.addActionListener(_ -> {
-            if (!gameState.isSpinning()) {
+            if (!gameState.isSpinning() && gameState.getBetMultiplier() < 10) {
                 gameState.setBetMultiplier(gameState.getBetMultiplier() + 1);
                 updateDisplays();
             }
@@ -323,11 +330,15 @@ public class SlotMachine extends JFrame {
         );
     }
 
+    public void playSound(String soundName) {
+        soundManager.play(soundName);
+    }
+
     public static void main(String[] args) {
         // Set system properties for better emoji rendering
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
         
-        SwingUtilities.invokeLater(() -> new SlotMachine().setVisible(true));
+        SwingUtilities.invokeLater(() -> AccountLogin.main(args));
     }
 }

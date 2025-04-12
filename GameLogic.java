@@ -152,17 +152,31 @@ public class GameLogic {
         winMessage.append("Wins:\n");
 
         // Calculate wins for each symbol
-        for (int i = 0; i < SYMBOLS.length; i++) {
-            int count = symbolCounts[i];
+        for (Symbol symbol : SYMBOLS) {
+            int count = 0;
+            for (int row = 0; row < ROWS; row++) {
+                for (int col = 0; col < COLS; col++) {
+                    if (grid[row][col].equals(symbol.getEmoji()) && matchedPositions[row][col]) {
+                        count++;
+                    }
+                }
+            }
             if (count >= 8) {
                 double multiplier;
-                if (count <= 9) multiplier = SYMBOLS[i].getPayoutMultiplier(3); // Use first multiplier
-                else if (count <= 11) multiplier = SYMBOLS[i].getPayoutMultiplier(4); // Use second multiplier
-                else multiplier = SYMBOLS[i].getPayoutMultiplier(5); // Use third multiplier
+                if (count <= 9) multiplier = symbol.getPayoutMultiplier(3); // Use first multiplier
+                else if (count <= 11) multiplier = symbol.getPayoutMultiplier(4); // Use second multiplier
+                else multiplier = symbol.getPayoutMultiplier(5); // Use third multiplier
 
                 double win = bet * multiplier;
                 currentRoundWin += win;
-                winMessage.append(String.format("%s x%d: $%.2f\n", SYMBOLS[i].getEmoji(), count, win));
+                winMessage.append(String.format("%s x%d: $%.2f\n", symbol.getEmoji(), count, win));
+
+                // Play jackpot sound for treasure wins, small win sound for others
+                if (symbol.getEmoji().equals("💎")) {
+                    slotMachine.playSound("jackpot");
+                } else if (!symbol.getEmoji().equals("💎") && !winMessage.toString().contains("jackpot")) {
+                    slotMachine.playSound("smallwin");
+                }
             }
         }
 

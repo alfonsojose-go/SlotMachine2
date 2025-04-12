@@ -8,7 +8,7 @@ public class GameState {
 
     public GameState() {
         this.balance = 1000.0;
-        this.coinValue = 0.05;
+        this.coinValue = 1.00;
         this.betMultiplier = 1;
         this.totalBet = coinValue * betMultiplier;
         this.isSpinning = false;
@@ -28,7 +28,8 @@ public class GameState {
     }
 
     public void setCoinValue(double value) {
-        this.coinValue = Math.max(0.05, Math.min(1.00, value));
+        // Ensure coin value stays between 1.00 and 10.00
+        this.coinValue = Math.max(1.00, Math.min(10.00, value));
         updateTotalBet();
     }
 
@@ -36,8 +37,9 @@ public class GameState {
         return betMultiplier;
     }
 
-    public void setBetMultiplier(int multiplier) {
-        this.betMultiplier = Math.max(1, Math.min(10, multiplier));
+    public void setBetMultiplier(int betMultiplier) {
+        // Ensure bet multiplier stays within valid range (1-10)
+        this.betMultiplier = Math.max(1, Math.min(10, betMultiplier));
         updateTotalBet();
     }
 
