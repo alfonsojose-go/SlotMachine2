@@ -341,4 +341,5 @@ public class SlotMachine extends JFrame {
         
         SwingUtilities.invokeLater(() -> AccountLogin.main(args));
     }
+    
 }
