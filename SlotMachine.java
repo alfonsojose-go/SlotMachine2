@@ -1,29 +1,38 @@
 import java.awt.*;
 import javax.swing.*;
+import java.text.NumberFormat;
 
 public class SlotMachine extends JFrame {
     // UI Components
-    public JLabel[][] reels = new JLabel[5][6];
-    public JButton spinButton = new JButton("SPIN");
-    public JButton increaseVol = new JButton("+");
-    public JButton decreaseVol = new JButton("-");
-    public JLabel accountLabel = new JLabel("Player:");
-    public JLabel accountBalance = new JLabel("$00.00");
-    public JLabel lblInsertCoin = new JLabel("Insert Coin:");
-    public JLabel lblbet = new JLabel("Bet Amount:");
-    public JLabel lblVolume = new JLabel("Vol:");
-    public JTextField insertCoin = new JTextField();
-    public JTextField betField = new JTextField();
-    public JTextField volumeVal = new JTextField();
+    private static final int ROWS = 5;
+    private static final int COLS = 6;
+    private JLabel[][] reels = new JLabel[ROWS][COLS]; // 5 rows x 6 columns
+    private JButton spinButton = new JButton("SPIN");
+    private JLabel accountLabel = new JLabel("Balance:");
+    private JLabel accountBalance = new JLabel("$1000.00");
+    private JLabel lblInsertCoin = new JLabel("Coin Value:");
+    private JLabel lblbet = new JLabel("Bet Amount:");
+    private JButton increaseCoin = new JButton("+");
+    private JButton decreaseCoin = new JButton("-");
+    private JButton increaseBet = new JButton("+");
+    private JButton decreaseBet = new JButton("-");
+    private JLabel coinValueDisplay = new JLabel("$0.05");
+    private JLabel betMultiplierDisplay = new JLabel("1x");
+    private JLabel totalBetDisplay = new JLabel("Total Bet: $0.05");
+    private JLabel messageLabel = new JLabel("");
+    private JLabel mermaidChanceLabel = new JLabel("Mermaid Chance: 10%");
     
     // Image paths
     private final String BG_PATH = "Assets/scales.jpg";
     private final String LEFT_DECOR = "Assets/leftDecor.jpg";
     private final String RIGHT_DECOR = "Assets/rightDecor.jpg";
     private final String TOP_DECOR = "Assets/topDecor.jpg";
-    private static final String[] SYMBOLS = {
-        "🐟", "🦀", "🐬", "🐚", "⚓", "🔱", "💎", "🚢", "💰"
-    };
+
+    // Game components
+    private GameState gameState;
+    private GameLogic gameLogic;
+    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+    private static final Font SYMBOL_FONT = new Font("Segoe UI Emoji", Font.PLAIN, 40);
 
     public SlotMachine() {
         // Frame setup
@@ -32,6 +41,10 @@ public class SlotMachine extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null); // Use absolute positioning
+
+        // Initialize game components
+        gameState = new GameState();
+        gameLogic = new GameLogic(gameState, this);
 
         // Main panel with background
         JPanel mainPanel = new JPanel(null) {
@@ -64,29 +77,38 @@ public class SlotMachine extends JFrame {
         mainPanel.add(rightPanel);
 
         // Create 5x6 grid of reels
-        JPanel reelsPanel = new JPanel(new GridLayout(6, 5, 10, 10));
+        JPanel reelsPanel = new JPanel(new GridLayout(ROWS, COLS, 10, 10)); // 5 rows, 6 columns
         reelsPanel.setBounds(150 + 15, 120, 700 - 30, 300);
         reelsPanel.setBackground(Color.WHITE);
         reelsPanel.setOpaque(true);
         reelsPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
-        // Initialize reels with random symbols
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 5; col++) {
-                reels[col][row] = new JLabel(SYMBOLS[(int)(Math.random() * SYMBOLS.length)], JLabel.CENTER);
-                reels[col][row].setFont(new Font("Segoe UI Emoji", Font.PLAIN, 40));
-                reels[col][row].setOpaque(true);
-                reels[col][row].setBackground(Color.WHITE);
-                reels[col][row].setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-                reelsPanel.add(reels[col][row]);
+        // Initialize reels
+        for (int row = 0; row < ROWS; row++) { // 5 rows
+            for (int col = 0; col < COLS; col++) { // 6 columns
+                reels[row][col] = new JLabel("🌊", JLabel.CENTER);
+                reels[row][col].setFont(SYMBOL_FONT);
+                reels[row][col].setOpaque(true);
+                reels[row][col].setBackground(Color.WHITE);
+                reels[row][col].setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                reelsPanel.add(reels[row][col]);
             }
         }
         mainPanel.add(reelsPanel);
 
+        // Add mermaid chance label
+        mermaidChanceLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        mermaidChanceLabel.setForeground(Color.BLUE);
+        mermaidChanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JPanel mermaidPanel = new JPanel();
+        mermaidPanel.add(mermaidChanceLabel);
+        mermaidPanel.setBounds(150, 80, 700, 30);
+        mainPanel.add(mermaidPanel);
+
         // Control panel area
         int controlY = 440;
         
-        // Player info
+        // Balance info
         accountLabel.setForeground(Color.WHITE);
         accountLabel.setFont(new Font("Arial", Font.BOLD, 14));
         accountLabel.setBounds(170, controlY, 60, 25);
@@ -94,57 +116,147 @@ public class SlotMachine extends JFrame {
         
         accountBalance.setForeground(Color.YELLOW);
         accountBalance.setFont(new Font("Arial", Font.BOLD, 14));
-        accountBalance.setBounds(240, controlY, 80, 25);
+        accountBalance.setBounds(240, controlY, 120, 25);
         mainPanel.add(accountBalance);
         
-        // Insert coin section
+        // Coin value controls
         lblInsertCoin.setForeground(Color.WHITE);
         lblInsertCoin.setFont(new Font("Arial", Font.BOLD, 14));
         lblInsertCoin.setBounds(170, controlY + 40, 90, 25);
         mainPanel.add(lblInsertCoin);
         
-        insertCoin.setFont(new Font("Arial", Font.PLAIN, 14));
-        insertCoin.setBounds(270, controlY + 40, 150, 25);
-        mainPanel.add(insertCoin);
+        decreaseCoin.setFont(new Font("Arial", Font.BOLD, 14));
+        decreaseCoin.setBounds(270, controlY + 40, 45, 25);
+        mainPanel.add(decreaseCoin);
         
-        // Bet amount section
+        coinValueDisplay.setForeground(Color.WHITE);
+        coinValueDisplay.setFont(new Font("Arial", Font.BOLD, 14));
+        coinValueDisplay.setBounds(320, controlY + 40, 60, 25);
+        mainPanel.add(coinValueDisplay);
+        
+        increaseCoin.setFont(new Font("Arial", Font.BOLD, 14));
+        increaseCoin.setBounds(385, controlY + 40, 45, 25);
+        mainPanel.add(increaseCoin);
+        
+        // Bet multiplier controls
         lblbet.setForeground(Color.WHITE);
         lblbet.setFont(new Font("Arial", Font.BOLD, 14));
-        lblbet.setBounds(430, controlY + 40, 90, 25);
+        lblbet.setBounds(440, controlY + 40, 90, 25);
         mainPanel.add(lblbet);
         
-        betField.setFont(new Font("Arial", Font.PLAIN, 14));
-        betField.setBounds(530, controlY + 40, 150, 25);
-        mainPanel.add(betField);
+        decreaseBet.setFont(new Font("Arial", Font.BOLD, 14));
+        decreaseBet.setBounds(540, controlY + 40, 45, 25);
+        mainPanel.add(decreaseBet);
+        
+        betMultiplierDisplay.setForeground(Color.WHITE);
+        betMultiplierDisplay.setFont(new Font("Arial", Font.BOLD, 14));
+        betMultiplierDisplay.setBounds(590, controlY + 40, 45, 25);
+        mainPanel.add(betMultiplierDisplay);
+        
+        increaseBet.setFont(new Font("Arial", Font.BOLD, 14));
+        increaseBet.setBounds(640, controlY + 40, 45, 25);
+        mainPanel.add(increaseBet);
+
+        // Total bet display
+        totalBetDisplay.setForeground(Color.WHITE);
+        totalBetDisplay.setFont(new Font("Arial", Font.BOLD, 14));
+        totalBetDisplay.setBounds(170, controlY + 80, 150, 25);
+        mainPanel.add(totalBetDisplay);
+
+        // Message label
+        messageLabel.setForeground(Color.YELLOW);
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        messageLabel.setBounds(350, controlY + 80, 300, 25);
+        mainPanel.add(messageLabel);
 
         // Spin button
         spinButton.setFont(new Font("Arial", Font.BOLD, 16));
         spinButton.setBackground(new Color(255, 215, 0));
         spinButton.setForeground(Color.BLACK);
-        spinButton.setBounds(700, controlY + 40, 120, 35);// Spin button
+        spinButton.setBounds(700, controlY + 40, 120, 35);
         mainPanel.add(spinButton);
         
-        // Volume controls
-        lblVolume.setForeground(Color.WHITE);
-        lblVolume.setFont(new Font("Arial", Font.BOLD, 14));
-        lblVolume.setBounds(170, controlY + 80, 40, 25);
-        mainPanel.add(lblVolume);
+        // Setup button actions
+        setupButtonActions();
         
-        volumeVal.setFont(new Font("Arial", Font.PLAIN, 14));
-        volumeVal.setText("50");
-        volumeVal.setBounds(220, controlY + 80, 50, 25);
-        mainPanel.add(volumeVal);
+        // Initial display updates
+        updateDisplays();
+    }
+
+    private void setupButtonActions() {
+        spinButton.addActionListener(_ -> gameLogic.spin());
         
-        // Volume buttons
-        decreaseVol.setFont(new Font("Arial", Font.BOLD, 14));
-        decreaseVol.setBounds(280, controlY + 80, 60, 25);
-        mainPanel.add(decreaseVol);
+        increaseCoin.addActionListener(_ -> {
+            if (!gameState.isSpinning()) {
+                gameState.setCoinValue(gameState.getCoinValue() + 0.05);
+                updateDisplays();
+            }
+        });
         
-        increaseVol.setFont(new Font("Arial", Font.BOLD, 14));
-        increaseVol.setBounds(330, controlY + 80, 60, 25);
-        mainPanel.add(increaseVol);
+        decreaseCoin.addActionListener(_ -> {
+            if (!gameState.isSpinning()) {
+                gameState.setCoinValue(gameState.getCoinValue() - 0.05);
+                updateDisplays();
+            }
+        });
         
+        increaseBet.addActionListener(_ -> {
+            if (!gameState.isSpinning()) {
+                gameState.setBetMultiplier(gameState.getBetMultiplier() + 1);
+                updateDisplays();
+            }
+        });
         
+        decreaseBet.addActionListener(_ -> {
+            if (!gameState.isSpinning()) {
+                gameState.setBetMultiplier(gameState.getBetMultiplier() - 1);
+                updateDisplays();
+            }
+        });
+    }
+
+    private void updateDisplays() {
+        accountBalance.setText(currencyFormat.format(gameState.getBalance()));
+        coinValueDisplay.setText(currencyFormat.format(gameState.getCoinValue()));
+        betMultiplierDisplay.setText(gameState.getBetMultiplier() + "x");
+        totalBetDisplay.setText("Total Bet: " + currencyFormat.format(gameState.getTotalBet()));
+    }
+
+    public void updateBalanceDisplay() {
+        SwingUtilities.invokeLater(() -> {
+            accountBalance.setText(currencyFormat.format(gameState.getBalance()));
+        });
+    }
+
+    public void updateSymbol(int row, int col, String symbol) {
+        reels[row][col].setText(symbol);
+    }
+
+    public void scaleSymbol(int row, int col, int scale) {
+        Font currentFont = reels[row][col].getFont();
+        reels[row][col].setFont(currentFont.deriveFont((float)(SYMBOL_FONT.getSize() * scale / 100)));
+    }
+
+    public void resetSymbolScale(int row, int col) {
+        reels[row][col].setFont(SYMBOL_FONT);
+    }
+
+    public void highlightSymbol(int row, int col, boolean highlight) {
+        reels[row][col].setForeground(highlight ? Color.RED : Color.BLACK);
+    }
+
+    public void showWinMessage(String message) {
+        messageLabel.setText(message);
+        Timer timer = new Timer(3000, _ -> messageLabel.setText(""));
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    public void updateMermaidChance(double chance) {
+        SwingUtilities.invokeLater(() -> 
+            mermaidChanceLabel.setText(String.format("Mermaid Chance: %.0f%%", chance * 100))
+        );
     }
 
     public static void main(String[] args) {
