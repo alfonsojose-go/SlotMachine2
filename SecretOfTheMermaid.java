@@ -1,7 +1,7 @@
-import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import javax.swing.*;
 
 public class SecretOfTheMermaid extends JFrame {
     private static final int ROWS = 5;
@@ -142,41 +142,41 @@ public class SecretOfTheMermaid extends JFrame {
         gbc.gridwidth = 3;
         controlPanel.add(multiplierLabel, gbc);
         
-        decreaseBetMultiplier.addActionListener(_ -> {
+        decreaseBetMultiplier.addActionListener(e -> {
             if (betMultiplier > 1) {
                 betMultiplier--;
                 updateBetLabels();
             }
         });
         
-        increaseBetMultiplier.addActionListener(_ -> {
+        increaseBetMultiplier.addActionListener(e -> {
             if (betMultiplier < 20) {
                 betMultiplier++;
                 updateBetLabels();
             }
         });
         
-        decreaseCoinValue.addActionListener(_ -> {
+        decreaseCoinValue.addActionListener(e-> {
             if (coinValue > 0.05) {
                 coinValue = Math.round((coinValue - 0.05) * 100.0) / 100.0;
                 updateBetLabels();
             }
         });
         
-        increaseCoinValue.addActionListener(_ -> {
+        increaseCoinValue.addActionListener(e -> {
             if (coinValue < 1.00) {
                 coinValue = Math.round((coinValue + 0.05) * 100.0) / 100.0;
                 updateBetLabels();
             }
         });
         
-        maxBetButton.addActionListener(_ -> {
+        maxBetButton.addActionListener(e -> {
             betMultiplier = 20;
             coinValue = 1.00;
             updateBetLabels();
         });
         
-        spinButton.addActionListener(_ -> {
+        spinButton.addActionListener(e -> {
             if (!isSpinning) {
                 spin();
             }

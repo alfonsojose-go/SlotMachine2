@@ -192,7 +192,7 @@ public class SlotMachine extends JFrame {
         spinButton.setForeground(Color.BLACK);
         spinButton.setBounds(700, controlY + 40, 120, 35);
         mainPanel.add(spinButton);
-        spinButton.addActionListener(_ -> {
+        spinButton.addActionListener(e -> {
             soundManager.play("spin");
         });
 
@@ -222,7 +222,7 @@ public class SlotMachine extends JFrame {
         volumePanel.add(increaseVol);
 
         // Volume button actions
-        increaseVol.addActionListener(_ -> {
+        increaseVol.addActionListener(e -> {
             try {
                 int current = Integer.parseInt(volumeVal.getText());
                 if (current < 100) {
@@ -233,7 +233,7 @@ public class SlotMachine extends JFrame {
             } catch (NumberFormatException ignored) {}
         });
 
-        decreaseVol.addActionListener(_ -> {
+        decreaseVol.addActionListener(e -> {
             try {
                 int current = Integer.parseInt(volumeVal.getText());
                 if (current > 0) {
@@ -256,30 +256,30 @@ public class SlotMachine extends JFrame {
     }
 
     private void setupButtonActions() {
-        spinButton.addActionListener(_ -> gameLogic.spin());
+        spinButton.addActionListener(e -> gameLogic.spin());
         
-        increaseCoin.addActionListener(_ -> {
+        increaseCoin.addActionListener(e -> {
             if (!gameState.isSpinning()) {
                 gameState.setCoinValue(gameState.getCoinValue() + 1.00);
                 updateDisplays();
             }
         });
         
-        decreaseCoin.addActionListener(_ -> {
+        decreaseCoin.addActionListener(e -> {
             if (!gameState.isSpinning()) {
                 gameState.setCoinValue(gameState.getCoinValue() - 1.00);
                 updateDisplays();
             }
         });
         
-        increaseBet.addActionListener(_ -> {
+        increaseBet.addActionListener(e -> {
             if (!gameState.isSpinning() && gameState.getBetMultiplier() < 10) {
                 gameState.setBetMultiplier(gameState.getBetMultiplier() + 1);
                 updateDisplays();
             }
         });
         
-        decreaseBet.addActionListener(_ -> {
+        decreaseBet.addActionListener(e -> {
             if (!gameState.isSpinning()) {
                 gameState.setBetMultiplier(gameState.getBetMultiplier() - 1);
                 updateDisplays();
@@ -319,7 +319,7 @@ public class SlotMachine extends JFrame {
 
     public void showWinMessage(String message) {
         messageLabel.setText(message);
-        Timer timer = new Timer(3000, _ -> messageLabel.setText(""));
+        Timer timer = new Timer(3000, e -> messageLabel.setText(""));
         timer.setRepeats(false);
         timer.start();
     }
