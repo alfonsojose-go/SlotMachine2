@@ -24,7 +24,7 @@ public class SlotMachine extends JFrame {
     
     // Volume controls
     private JLabel lblVolume = new JLabel("Vol:");
-    private JTextField volumeVal = new JTextField();
+    private JLabel volumeVal = new JLabel();
     private JButton decreaseVol = new JButton("-");
     private JButton increaseVol = new JButton("+");
     
@@ -138,7 +138,7 @@ public class SlotMachine extends JFrame {
         // Mermaid chance label
         mermaidChanceLabel.setFont(new Font("Arial", Font.BOLD, 14));
         mermaidChanceLabel.setForeground(new Color(0, 191, 255));
-        mermaidChanceLabel.setBounds(530, controlY, 150, 25);
+        mermaidChanceLabel.setBounds(530, controlY, 180, 25);
         mainPanel.add(mermaidChanceLabel);
 
         // Message label
@@ -206,10 +206,10 @@ public class SlotMachine extends JFrame {
         lblVolume.setFont(new Font("Arial", Font.BOLD, 14));
         volumePanel.add(lblVolume);
         
-        volumeVal.setFont(new Font("Arial", Font.PLAIN, 14));
+        volumeVal.setForeground(Color.WHITE);
+        volumeVal.setFont(new Font("Arial", Font.BOLD, 14));
         volumeVal.setText("50");
         volumeVal.setPreferredSize(new Dimension(30, 25));
-        volumeVal.setEditable(false); // Make readonly
         volumeVal.setHorizontalAlignment(JTextField.CENTER); // Center the text
         volumePanel.add(volumeVal);
         
